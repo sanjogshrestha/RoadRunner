@@ -4,6 +4,7 @@
     android:layout_height="match_parent"
     android:padding="@dimen/activity_horizontal_margin">
 
+    <!--
     <com.github.glomadrian.roadrunner.ProgressRoadRunner xmlns:lib="http://schemas.android.com/apk/res-auto"
         android:id="@+id/progressRunner"
         android:layout_width="match_parent"
@@ -15,6 +16,13 @@
         lib:path_original_height="@integer/twitter_original_height"
         lib:path_original_width="@integer/twitter_original_width"
         lib:stroke_width="3sp" />
+        -->
+
+    <RelativeLayout
+        android:id="@+id/runnerHolder"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/seek"></RelativeLayout>
 
     <SeekBar
         android:id="@+id/seek"

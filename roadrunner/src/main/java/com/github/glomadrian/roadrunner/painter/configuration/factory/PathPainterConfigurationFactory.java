@@ -4,6 +4,7 @@ import android.content.res.TypedArray;
 import android.graphics.Color;
 
 import com.github.glomadrian.roadrunner.R;
+import com.github.glomadrian.roadrunner.builder.RoadRunnerBuilder;
 import com.github.glomadrian.roadrunner.painter.configuration.Direction;
 import com.github.glomadrian.roadrunner.painter.configuration.PathPainterConfiguration;
 import com.github.glomadrian.roadrunner.painter.configuration.determinate.TwoWayDeterminateConfiguration;
@@ -16,6 +17,15 @@ import com.github.glomadrian.roadrunner.painter.indeterminate.IndeterminatePaint
  * @author Adrián García Lomas
  */
 public class PathPainterConfigurationFactory {
+
+    public static PathPainterConfiguration makeConfiguration(RoadRunnerBuilder builder,
+                                                             DeterminatePainter indeterminatePainter) {
+        switch (indeterminatePainter) {
+            case PROGRESS:
+            default:
+                return makeMaterialConfiguration(builder);
+        }
+    }
 
     public static PathPainterConfiguration makeConfiguration(TypedArray typedArray,
                                                              IndeterminatePainter indeterminatePainter) {
@@ -38,6 +48,17 @@ public class PathPainterConfigurationFactory {
             default:
                 return makeTwoWayDeterminateConfiguration(typedArray);
         }
+    }
+
+    private static PathPainterConfiguration makeMaterialConfiguration(RoadRunnerBuilder builder) {
+        MaterialPainterConfiguration materialPainterConfiguration =
+                MaterialPainterConfiguration.newBuilder()
+                        .withColor(builder.color)
+                        .withStrokeWidth(builder.strokeWidth)
+                        .withMovementDirection(builder.movementDirection)
+                        .build();
+
+        return materialPainterConfiguration;
     }
 
     private static PathPainterConfiguration makeMaterialConfiguration(TypedArray typedArray) {

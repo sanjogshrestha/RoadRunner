@@ -1,17 +1,21 @@
 package com.github.glomadrian.pathloading.ui.progress;
 
 import android.animation.ObjectAnimator;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.animation.FastOutSlowInInterpolator;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 
 import com.github.glomadrian.pathloading.R;
 import com.github.glomadrian.roadrunner.ProgressRoadRunner;
+import com.github.glomadrian.roadrunner.painter.configuration.Direction;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -25,7 +29,9 @@ public class ProgressFragment extends Fragment implements SeekBar.OnSeekBarChang
     @Bind(R.id.seek)
     SeekBar seekBar;
 
-    @Bind(R.id.progressRunner)
+    @Bind(R.id.runnerHolder)
+    RelativeLayout runnerHolder;
+
     ProgressRoadRunner roadRunner;
 
     private ObjectAnimator infiniteAnimator;
@@ -46,6 +52,16 @@ public class ProgressFragment extends Fragment implements SeekBar.OnSeekBarChang
 
         seekBar.setOnSeekBarChangeListener(this);
 
+        roadRunner = (ProgressRoadRunner) new ProgressRoadRunner.Builder(view.getContext())
+                .setOriginalSizes(getResources().getInteger(R.integer.twitter_original_width),
+                        getResources().getInteger(R.integer.twitter_original_height))
+                .setPath(getString(R.string.twitter))
+                .setColor(Color.BLACK)
+                .setStrokeWidth(10)
+                .setMovementDirection(Direction.CLOCKWISE)
+                .build();
+
+        runnerHolder.addView(roadRunner, new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         return view;
     }
 

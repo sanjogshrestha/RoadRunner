@@ -6,6 +6,7 @@ import android.graphics.Canvas;
 import android.util.AttributeSet;
 import android.util.Log;
 
+import com.github.glomadrian.roadrunner.builder.RoadRunnerBuilder;
 import com.github.glomadrian.roadrunner.painter.configuration.PathPainterConfiguration;
 import com.github.glomadrian.roadrunner.painter.configuration.factory.PathPainterConfigurationFactory;
 import com.github.glomadrian.roadrunner.painter.determinate.DeterminatePainter;
@@ -40,9 +41,13 @@ public class ProgressRoadRunner extends RoadRunner {
     private PathPainterConfiguration pathPainterConfiguration;
     private boolean firstDraw = true;
 
-    public ProgressRoadRunner(Context context) {
-        super(context);
-        throw new UnsupportedOperationException("The view can not be created programmatically yet");
+    private ProgressRoadRunner(Builder builder) {
+        super(builder.context);
+
+        pathData = builder.pathData;
+        originalWidth = builder.originalWidth;
+        originalHeight = builder.originalHeight;
+        pathPainterConfiguration = PathPainterConfigurationFactory.makeConfiguration(builder, DeterminatePainter.PROGRESS);
     }
 
     public ProgressRoadRunner(Context context, AttributeSet attrs) {
@@ -95,16 +100,22 @@ public class ProgressRoadRunner extends RoadRunner {
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
+
         try {
             pathContainer = buildPathData(w, h, pathData, originalWidth, originalHeight);
             initPathPainter();
         } catch (ParseException e) {
             Log.e(TAG, "Path parse exception:", e);
+        } catch (NullPointerException e) {
+            Log.e(TAG, "Path data or original sizes are not initialized yet.");
         }
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
+        if (progressDeterminatePainter == null)
+            return;
+
         if (!firstDraw) {
             progressDeterminatePainter.paintPath(canvas);
         } else {
@@ -139,6 +150,27 @@ public class ProgressRoadRunner extends RoadRunner {
     private void initPathPainter() {
         progressDeterminatePainter = DeterminatePainterFactory.makeIndeterminatePathPainter(
                 DeterminatePainter.PROGRESS, pathContainer, this, pathPainterConfiguration);
+    }
+
+    public static class Builder extends RoadRunnerBuilder {
+
+        public Builder(Context context) {
+            super(context);
+        }
+
+        @Override
+        public ProgressRoadRunner build() {
+            AssertUtils.assertThis(pathData != null, "Path data must be defined", this.getClass());
+            AssertUtils.assertThis(!pathData.isEmpty(), "Path data must be defined", this.getClass());
+            AssertUtils.assertThis(!pathData.equals(""), "Path data must be defined", this.getClass());
+            AssertUtils.assertThis(originalWidth > 0, "Original with of the path must be defined",
+                    this.getClass());
+            AssertUtils.assertThis(originalHeight > 0, "Original height of the path must be defined",
+                    this.getClass());
+
+            return new ProgressRoadRunner(this);
+        }
+
     }
 
 }
